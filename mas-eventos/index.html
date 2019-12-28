@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Vue</title>
+    <style>
+      .usuarios {
+        display: flex;
+        justify-content: space-between;
+      }
+      .usuario {
+        text-align: center;
+        padding: 20px;
+        border: 1px solid;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+    <article class="usuarios">
+        <section class="disponibles">
+          <h1>Usuarios disponibles {{ usuariosDisponibles.length }}</h1>
+          <usuario v-for="usuario in usuariosDisponibles" :info="usuario"></usuario>
+        </section>
+    <article/>
+
+      <pre>{{ $data }}</pre>
+      
+    </div>
+
+    <script type="text/x-template" id="usuario-template">
+      <article class="usuario">
+          <img :src="info.picture.large" :alt="info.nombre">
+          <h1 class="usuario__nombre">{{ nombreCompleto }}</h1>
+          <a :href="info.email">{{ info.email }}</a>
+          <p>{{ info.username }}</p>
+      </article>
+    </script>
+
+    <!-- development version, includes helpful console warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <script>
+      // Usuario individual
+      const usuario = {
+        props: ["info"],
+        template: "#usuario-template",
+        computed: {
+          nombreCompleto() {
+            return `${this.info.name.title}: ${this.info.name.first} ${this.info.name.last}`;
+          }
+        },
+        methods: {
+          
+        }
+      };
+
+      new Vue({
+        created() {
+          fetch("https://randomuser.me/api/?results=50")
+            .then(respuesta => respuesta.json())
+            .then(respuesta => this.usuariosDisponibles = respuesta.results.map(usuario => {
+                  return {
+                    username: usuario.login.username,
+                    name: usuario.name,
+                    email: usuario.email,
+                    picture: usuario.picture
+                  };
+                })
+            );
+        },
+        el: "#app",
+        data: {
+          usuariosDisponibles: [],        
+        },
+        components: {
+            usuario
+        }
+      });
+      Vue.config.devtools = true;
+    </script>
+  </body>
+</html>
